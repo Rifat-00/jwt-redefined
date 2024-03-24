@@ -14,6 +14,7 @@ import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 @Service
@@ -22,7 +23,9 @@ public class JwtService {
     private String secretKey = "cECBTpCjewdSCO9VRgdIo3Zl7pa0vUdsa+jVX5qz74g=\n";
     private final long jwtExpiration;
     private final long refreshExpiration;
-
+    
+    // Access Token  Refresh Token
+    
     //build tokenBuilder
     private String tokenBuilder(
             Map<String, Object> extraClaims,
@@ -33,7 +36,7 @@ public class JwtService {
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + expiration))
+                .setExpiration(new Date(System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(expiration)))
                 .signWith(  secretKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -74,7 +77,11 @@ public class JwtService {
 
     //extract username
     public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
+        try {
+            return extractClaim(token, Claims::getSubject);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     //extract expiration

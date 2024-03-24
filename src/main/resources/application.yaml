@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: jwt-redefined
+  datasource:
+    url: jdbc:mysql://localhost:3306/jwt
+    username: rifat
+    password: rifat
+  jpa:
+    hibernate:
+      ddl-auto: create
+      properties:
+        hibernate:
+          dialect: org.hibernate.dialect.MySQL8Dialect
+          format_sql: true
+          
+  docker:
+    compose:
+      enabled: true
+      file: docker-compose.yaml
+      
+      
+
+#logging:
+#  level:
+#    org.springframework.security.*: trace

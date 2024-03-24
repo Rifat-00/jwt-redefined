@@ -6,6 +6,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 
@@ -39,10 +41,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         jwtToken = authHeader.substring(7); //gets the actual token
         userEmail = jwtService.extractUsername(jwtToken);
 
+        if (userEmail == null) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
         //check if a valid user email was extracted from the JWT token and
         //if the current security context does not have an existing authentication.
         //if so, load the user
-        if(userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null){
+        if(SecurityContextHolder.getContext().getAuthentication() == null){
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
             //check token validity
             boolean isTokenValid = tokenRepo.findByToken(jwtToken)
