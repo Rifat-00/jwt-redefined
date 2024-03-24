@@ -30,12 +30,12 @@ public class JwtConfig {
 
     @Bean
     public long jwtExpiration(){
-        return 60*60;
+        return 60*60*1000;
     }
 
     @Bean
     public long refreshExpiration(){
-        return 60*60*24;
+        return 60*60*1000*24;
     }
 
 
