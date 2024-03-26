@@ -1,8 +1,11 @@
 package com.security.jwtredefined.config;
 
+import jakarta.servlet.Filter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -11,7 +14,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.*;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 
 @Configuration
@@ -42,8 +45,18 @@ public class SecurityConfig {
                                 .addLogoutHandler(logoutHandler)
                                 .logoutSuccessHandler(((request, response, authentication) -> SecurityContextHolder.clearContext()))
                 );
+        
 
         return http.build();
+    }
+    @Bean
+    public FilterRegistrationBean<Filter> registerFilter(JwtAuthFilter filter) {
+        FilterRegistrationBean<Filter> registration = new FilterRegistrationBean<>();
+        registration.setFilter(filter);
+        registration.setOrder(Ordered.HIGHEST_PRECEDENCE);
+        // Disable for servlet context
+        registration.setEnabled(false);
+        return registration;
     }
 }
 
